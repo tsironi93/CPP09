@@ -19,7 +19,7 @@ int main(int ac, char *av[]) {
 
   std::string line;
   while (std::getline(fd, line)) {
-    std::cout << line << std::endl;
+    bitcoinExchange::exchange(line);
   }
 
   fd.close();
