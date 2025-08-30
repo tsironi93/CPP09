@@ -2,7 +2,7 @@ NAME			= PmergeMe
 #BONUS_NAME 	= _bonus
 
 CXX				= c++
-CXXFLAGS		= -Wfatal-errors -Wall -Wextra -Werror -O2 -std=c++17 -MMD -Wshadow -Wno-shadow -g -fsanitize=address -fno-omit-frame-pointer
+CXXFLAGS		= -Wfatal-errors -Wall -Wextra -Werror -O2 -std=c++17 -MMD -Wshadow -Wno-shadow -g #-fsanitize=address -fno-omit-frame-pointer
 
 SRC_DIR         = .
 OBJ_DIR         = src_o

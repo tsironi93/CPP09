@@ -1,6 +1,7 @@
 #include "./PmergeMe.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -81,27 +82,59 @@ template <typename T> static void jacob(T container, unsigned long n) {
   int numBGroups = (pending.size() / n);
   std::cout << "\nSize / n is: " << numBGroups << std::endl;
 
-  while (Jnum <= numBGroups + 1) {
-    for (auto it = main.begin() + n; it != main.end(); it += n) {
-      if (pending[Jnum * n] < *it) {
-        // append
-      }
-    }
-    Jnum = jacobNumber(++jacobIndex);
-  }
-
-  // i = 0;
-  // for (auto it = container.begin(); it != container.end(); ++it) {
-  //   if (i % n == n - 1 && *(it - n / 2) > *it) {
-  //     for (unsigned long temp = i; temp > i - n / 2; --temp) {
-  //       std::swap(container[temp], container[temp - n / 2]);
-  //     }
-  //   }
-  //   ++i;
-  // }
-
   printDebugs(main, "Main chain");
   printDebugs(pending, "Pending chain");
+
+  static size_t numComparisons;
+  int counter = 1;
+  while (pending.size() != 0) {
+
+    size_t startingBounds = 2 * n - 1;
+    size_t endingBounds = pending.size() - 1;
+
+    for (size_t k = startingBounds; k <= main.size(); k += n) {
+
+      size_t insert_index = (Jnum - counter) * n - 1;
+
+      if (insert_index > pending.size() || pending.size() == 0) {
+        break;
+      }
+
+      std::cout << "pending < main : " << pending[insert_index] << " < "
+                << main[k] << std::endl;
+
+      if (main[k] > main[endingBounds]) {
+        main.insert(main.begin() + k + 1,
+                    pending.begin() + insert_index - n + 1,
+                    pending.begin() + insert_index + 1);
+        pending.erase(pending.begin() + insert_index - n + 1,
+                      pending.begin() + insert_index + 1);
+        printDebugs(main, "Insersion");
+        printDebugs(pending, "Erasing");
+        endingBounds = k + 1;
+      } else if (pending[insert_index] < main[k]) {
+        numComparisons++;
+        main.insert(main.begin() + k - n + 1,
+                    pending.begin() + insert_index - n + 1,
+                    pending.begin() + insert_index + 1);
+        pending.erase(pending.begin() + insert_index - n + 1,
+                      pending.begin() + insert_index + 1);
+        printDebugs(main, "Insersion");
+        printDebugs(pending, "Erasing");
+        endingBounds = k + 1;
+      }
+    }
+    counter++;
+  }
+
+  int nonPartisipating = container.size() % n;
+  while (nonPartisipating--) {
+    main.push_back(container[container.size() - nonPartisipating]);
+    container.clear();
+    std::copy(main.begin(), main.end(), container.begin());
+  }
+  std::cout << "malaaaaaaaaaaaaaaaaaaaaaaaaakaaa\n"
+            << "Number of Comparisons is : " << numComparisons << std::endl;
 }
 
 template <>
