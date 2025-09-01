@@ -25,17 +25,21 @@ static int jacobNumber(int n) {
 template <typename T> static void jacob(T &container, unsigned long n) {
 
   if (n > container.size()) {
+    printDebugs(container, "Final After req down");
     return;
   }
 
-  int i = 0;
-  for (auto it = container.begin(); it != container.end(); ++it) {
-    if (i >= static_cast<int>(n / 2) && i % n == n - 1 && *(it - n / 2) > *it) {
-      for (unsigned long temp = i; temp > i - n / 2; --temp) {
-        std::swap(container[temp], container[temp - n / 2]);
+  if (n != 1) {
+    size_t size = container.size();
+    for (size_t i = n - 1; i < size; i += n) {
+      std::cout << "Comparisons : " << container[i] << " > "
+                << container[i - n / 2] << std::endl;
+      if (i % n == n - 1 && container[i - n / 2] > container[i]) {
+        for (unsigned long temp = i; temp > i - n / 2; --temp) {
+          std::swap(container[temp], container[temp - n / 2]);
+        }
       }
     }
-    ++i;
   }
 
   n = n << 1;
@@ -48,8 +52,6 @@ template <typename T> static void jacob(T &container, unsigned long n) {
   }
 
   n = n >> 1;
-  n = n >> 1;
-
   int jacobIndex = 2;
   int Jnum = jacobNumber(jacobIndex);
   // std::cout << "\nJacob number is: " << Jnum << std::endl;
@@ -127,7 +129,7 @@ template <typename T> static void jacob(T &container, unsigned long n) {
                       pending.begin() + insert_index + 1);
           pending.erase(pending.begin() + insert_index - n + 1,
                         pending.begin() + insert_index + 1);
-          endingBounds = k - n;
+          endingBounds = k + n;
         } else {
           main.insert(main.begin() + k - n + 1, pending[insert_index]);
           pending.erase(pending.begin() + insert_index);
@@ -152,6 +154,12 @@ template <typename T> static void jacob(T &container, unsigned long n) {
         printDebugs(main, "Auto Insersion");
         printDebugs(pending, "Auto Erasing");
         break;
+      } else if (k == main.size() - 1) {
+        main.insert(main.end(), pending.begin() + insert_index - n + 1,
+                    pending.begin() + 1);
+        pending.erase(pending.begin() + insert_index - n + 1,
+                      pending.begin() + insert_index + 1);
+        endingBounds = k;
       }
 
       std::cout << "Ending Bounds Number: " << main[endingBounds] << std::endl;
@@ -169,9 +177,10 @@ template <typename T> static void jacob(T &container, unsigned long n) {
   container.insert(container.end(), main.begin(), main.end());
   main.clear();
   pending.clear();
-  // std::cout << "malaaaaaaaaaaaaaaaaaaaaaaaaakaaa\n"
-  //           << "Number of Comparisons is : " << numComparisons << std::endl;
-  printDebugs(container, "After");
+  std::cout << "malaaaaaaaaaaaaaaaaaaaaaaaaakaaa\n"
+            << "Number of Comparisons is : " << numComparisons << std::endl;
+  printDebugs(container, "Reqursion up groups of" + std::to_string(n));
+  std::cout << "groups of " << n << std::endl;
 }
 
 template <>
@@ -181,7 +190,8 @@ void pMerge::merge<std::vector<unsigned long>>(
             << std::endl;
   printDebugs(container, "BEGIN");
   // Merge sort logic
-  jacob(container, 2);
+  jacob(container, 1);
+  std::cout << std::is_sorted(container.begin(), container.end()) << std::endl;
 }
 
 template <>
@@ -191,5 +201,8 @@ void pMerge::merge<std::deque<unsigned long>>(
             << std::endl;
   printDebugs(container, "BEGIN");
   // Merge sort logic
-  jacob(container, 2);
+  jacob(container, 1);
+  std::cout << std::is_sorted(container.begin(), container.end()) << std::endl;
 }
+
+// ./PmergeMe 11 2 17 0 16 8 6 15 10 3  1  18 9 14   19 12 5 4 20 13 7
