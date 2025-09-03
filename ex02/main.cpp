@@ -1,9 +1,16 @@
 #include "./PmergeMe.hpp"
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <iostream>
-#include <ostream>
+#include <ratio>
 #include <string>
+
+template <typename T> static bool hasDuplicates(T container) {
+  std::sort(container.begin(), container.end());
+  return std::adjacent_find(container.begin(), container.end()) !=
+         container.end();
+}
 
 int main(int ac, char **av) {
 
@@ -35,15 +42,25 @@ int main(int ac, char **av) {
     }
   }
 
-  // ================Before==========================================
-  std::cout << "Before:\t";
-  for (auto it = argv.begin(); it != argv.end(); ++it) {
-    std::cout << *it << " ";
+  if (hasDuplicates(vectorMerge)) {
+    std::cerr << "Duplicates found in the sequence" << std::endl;
+    return -4;
   }
-  std::cout << std::endl;
 
+  auto startVector = std::chrono::high_resolution_clock::now();
   pMerge::merge(vectorMerge);
-  // pMerge::merge(dequeMerge);
+  auto endVector = std::chrono::high_resolution_clock::now();
+  auto vectorTime =
+      std::chrono::duration<double, std::micro>(endVector - startVector);
+  std::cout << "The time that it took the vector container is: "
+            << vectorTime.count() << " microseconds." << std::endl;
+
+  auto start = std::chrono::high_resolution_clock::now();
+  pMerge::merge(dequeMerge);
+  auto end = std::chrono::high_resolution_clock::now();
+  auto time = std::chrono::duration<double, std::micro>(end - start);
+  std::cout << "The time that it took the deque container is: " << time.count()
+            << " microseconds." << std::endl;
 
   return 0;
 }
